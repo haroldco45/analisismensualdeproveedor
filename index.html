@@ -294,6 +294,45 @@
             margin-bottom: 1rem;
         }
         
+        .btn-print {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-print:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+        }
+        
+        .btn-whatsapp:hover {
+            background: #20ba5c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 211, 102, 0.3);
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .header, .btn-group, .btn-print, .btn-whatsapp, .footer {
+                display: none !important;
+            }
+            .card {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                page-break-inside: avoid;
+            }
+            .resultado {
+                display: block !important;
+            }
+        }
+        
         .proyeccion-table {
             width: 100%;
             border-collapse: collapse;
@@ -397,6 +436,12 @@
                     <div class="input-helper">Lo que LE HE COMPRADO (me debe) a este proveedor</div>
                 </div>
                 
+                <div class="form-group">
+                    <label for="numeroWhatsapp">📱 Número WhatsApp (Opcional)</label>
+                    <input type="text" id="numeroWhatsapp" placeholder="Ej: 573117700431" value="">
+                    <div class="input-helper">Celular con código país (Ej: 57 = Colombia). Sin símbolos ni espacios</div>
+                </div>
+                
                 <div class="btn-group">
                     <button class="btn-analizar" onclick="analizarDatos()">🔍 Analizar Mes</button>
                     <button class="btn-limpiar" onclick="limpiarDatos()">🗑️ Limpiar</button>
@@ -486,6 +531,16 @@
         <!-- ANÁLISIS PROFUNDO -->
         <div class="card resultado" id="resultadoProfundo">
             <h2>🔬 Análisis Profundo Operacional</h2>
+            
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                <button onclick="imprimirAnalisis()" style="flex: 1; padding: 0.75rem; background: #10b981; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                    🖨️ Imprimir
+                </button>
+                <button onclick="enviarWhatsApp()" style="flex: 1; padding: 0.75rem; background: #25d366; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                    💬 Enviar WhatsApp
+                </button>
+            </div>
+            
             <div id="analisisProfundo"></div>
         </div>
         
@@ -502,6 +557,52 @@
                 currency: 'COP',
                 maximumFractionDigits: 0
             }).format(valor);
+        }
+        
+        function imprimirAnalisis() {
+            window.print();
+        }
+        
+        function enviarWhatsApp() {
+            const numeroWhatsapp = document.getElementById('numeroWhatsapp').value;
+            
+            if (!numeroWhatsapp) {
+                alert('⚠️ Por favor ingresa un número de WhatsApp primero');
+                return;
+            }
+            
+            const nombreProveedor = document.getElementById('nombreProveedor').value || 'PROVEEDOR';
+            const diasHabiles = document.getElementById('diasHabiles').value;
+            const diasTrabajados = document.getElementById('diasTrabajados').value;
+            const diasFaltan = diasHabiles - diasTrabajados;
+            const ventaMensual = document.getElementById('ventaDiaria').textContent;
+            const rotacion = document.getElementById('rotacion').textContent;
+            const margenSimple = document.getElementById('margenCartera').textContent;
+            const margenRespaldo = document.getElementById('margenConRespaldo').textContent;
+            const cobertura = document.getElementById('cobertura').textContent;
+            
+            const mensaje = `📊 *ANÁLISIS FINANCIERO - ${nombreProveedor}* 📊
+
+📅 *PERÍODO: JULIO 2026*
+Días hábiles: ${diasHabiles}
+Días trabajados: ${diasTrabajados}
+Días que faltan: ${diasFaltan}
+
+💵 *MÉTRICAS CLAVE*
+Venta Diaria: ${ventaMensual}
+Rotación: ${rotacion}
+Cobertura Inventario: ${cobertura}
+
+💰 *MÁRGENES*
+Margen Simple (CxC-CxP): ${margenSimple}
+Margen CON Respaldo: ${margenRespaldo}
+
+⏰ Generado el: ${new Date().toLocaleString('es-CO')}
+
+_Análisis generado por Financial Analyzer_`;
+            
+            const urlWhatsapp = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(mensaje)}`;
+            window.open(urlWhatsapp, '_blank');
         }
         
         function actualizarDiasFaltantes() {
@@ -718,6 +819,7 @@
             document.getElementById('inventario').value = '';
             document.getElementById('cxcProveedor').value = '';
             document.getElementById('cxpProveedor').value = '';
+            document.getElementById('numeroWhatsapp').value = '';
             document.getElementById('diasFaltanMostrado').textContent = '0';
             
             document.getElementById('resultado').classList.remove('activo');
