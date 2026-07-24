@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Análisis Mensual de Proveedores - Operacional y Real">
+    <meta name="theme-color" content="#1e40af">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Financial Analyzer">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Financial Analyzer - Análisis Mensual Operacional">
+    <meta property="og:description" content="Análisis de proveedores mes a mes: inventario, ventas, cartera, proyecciones reales.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://financial-analyzer-vibras.netlify.app/">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630/1e40af/ffffff?text=Financial+Analyzer">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Financial Analyzer">
+    <meta name="twitter:description" content="Análisis Mensual de Proveedores">
+    <meta name="twitter:image" content="https://via.placeholder.com/1200x630/1e40af/ffffff?text=Financial+Analyzer">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%231e40af' width='192' height='192'/><text x='96' y='140' font-size='120' font-weight='bold' text-anchor='middle' fill='white'>$</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%231e40af' width='192' height='192'/><text x='96' y='140' font-size='120' font-weight='bold' text-anchor='middle' fill='white'>$</text></svg>">
+    
+    <title>Financial Analyzer - Análisis Mensual 📊</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #1e40af;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            color: #1e40af;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 3px solid #1e40af;
+            padding-bottom: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #1e40af;
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+        
+        .input-helper {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 0.3rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        button {
+            flex: 1;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-analizar {
+            background: #1e40af;
+            color: white;
+        }
+        
+        .btn-analizar:hover {
+            background: #1e3a8a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(30, 64, 175, 0.3);
+        }
+        
+        .btn-limpiar {
+            background: #e5e7eb;
+            color: #333;
+        }
+        
+        .btn-limpiar:hover {
+            background: #d1d5db;
+        }
+        
+        .resultado {
+            display: none;
+        }
+        
+        .resultado.activo {
+            display: block;
+        }
+        
+        .metrica {
+            background: linear-gradient(135deg, #f0f4ff 0%, #f8faff 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #1e40af;
+        }
+        
+        .metrica-titulo {
+            color: #1e40af;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metrica-valor {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 0.3rem;
+        }
+        
+        .metrica-descripcion {
+            color: #666;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        
+        .analisis-profundo {
+            background: linear-gradient(135deg, #f0f4ff 0%, #f8faff 100%);
+            padding: 2rem;
+            border-radius: 8px;
+            border-left: 4px solid #059669;
+            margin-bottom: 1.5rem;
+        }
+        
+        .analisis-profundo h3 {
+            color: #059669;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .analisis-punto {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            position: relative;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .analisis-punto::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #059669;
+            font-weight: bold;
+        }
+        
+        .recomendacion {
+            background: linear-gradient(135deg, #fef3c7 0%, #fef8e7 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+            margin-bottom: 1.5rem;
+        }
+        
+        .recomendacion h4 {
+            color: #f59e0b;
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer {
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+            margin-top: 2rem;
+            font-size: 0.85rem;
+        }
+        
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 4px;
+            color: #92400e;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .success-badge {
+            display: inline-block;
+            background: #d1fae5;
+            color: #065f46;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        
+        .danger-badge {
+            display: inline-block;
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        
+        .proyeccion-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .proyeccion-table th {
+            background: #1e40af;
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .proyeccion-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+        }
+        
+        .proyeccion-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .label-row {
+            background: #f3f4f6;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .numero {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            color: #1e40af;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Financial Analyzer Mensual</h1>
+            <p>Análisis Operacional Mes a Mes por Proveedor</p>
+        </div>
+        
+        <div class="content">
+            <!-- FORMULARIO -->
+            <div class="card">
+                <h2>📝 Datos del Mes Actual</h2>
+                
+                <div class="form-group">
+                    <label for="nombreProveedor">Nombre del Proveedor</label>
+                    <input type="text" id="nombreProveedor" placeholder="Ej: BRINSA" value="BRINSA">
+                    <div class="input-helper">Nombre del proveedor a analizar</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>📅 Días Hábiles (Julio 2026)</label>
+                    <div class="form-row">
+                        <div>
+                            <label for="diasHabiles" style="font-size: 0.85rem; margin-bottom: 0.3rem;">Días hábiles TOTALES del mes</label>
+                            <input type="number" id="diasHabiles" placeholder="Ej: 22" value="22" min="1" max="31">
+                            <div class="input-helper">Total de días que se trabaja en julio (excluye domingos/festivos)</div>
+                        </div>
+                        <div>
+                            <label for="diasTrabajados" style="font-size: 0.85rem; margin-bottom: 0.3rem;">Días hábiles TRABAJADOS</label>
+                            <input type="number" id="diasTrabajados" placeholder="Ej: 15" value="15" min="1" max="31">
+                            <div class="input-helper">Desde el 1 hasta hoy (24 de julio)</div>
+                        </div>
+                    </div>
+                    <div id="diasCalculados" style="background: #e0f2fe; padding: 0.75rem; border-radius: 6px; margin-top: 0.75rem; font-size: 0.9rem; color: #0369a1; border-left: 3px solid #0369a1;">
+                        📌 <strong>Calculado:</strong> Faltan <span id="diasFaltanMostrado">7</span> días hábiles para fin de mes
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ventasMes">Ventas en Línea - Julio Actual (COP)</label>
+                    <input type="number" id="ventasMes" placeholder="Ej: 45000000" value="45000000">
+                    <div class="input-helper">Ventas ya generadas de este proveedor este mes</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inventario">Inventario Actual en Bodega (COP)</label>
+                    <input type="number" id="inventario" placeholder="Ej: 186250515" value="186250515">
+                    <div class="input-helper">Valor de stock de este proveedor HOY</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cxcProveedor">CxC por este Proveedor (COP)</label>
+                    <input type="number" id="cxcProveedor" placeholder="Ej: 65000000" value="65000000">
+                    <div class="input-helper">Lo que me deben los clientes por compras de este proveedor</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cxpProveedor">CxP al Proveedor (COP)</label>
+                    <input type="number" id="cxpProveedor" placeholder="Ej: 120000000" value="120000000">
+                    <div class="input-helper">Lo que LE HE COMPRADO (me debe) a este proveedor</div>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn-analizar" onclick="analizarDatos()">🔍 Analizar Mes</button>
+                    <button class="btn-limpiar" onclick="limpiarDatos()">🗑️ Limpiar</button>
+                </div>
+            </div>
+            
+            <!-- RESULTADOS RÁPIDOS -->
+            <div class="card resultado" id="resultado">
+                <h2>📊 Resumen Mes Actual</h2>
+                
+                <div id="nombreResultado" style="margin-bottom: 1.5rem;"></div>
+                
+                <div class="metrica">
+                    <div class="metrica-titulo">💵 Venta Diaria Promedio</div>
+                    <div class="metrica-valor" id="ventaDiaria">-</div>
+                    <div class="metrica-descripcion">En días que ya trabajaste</div>
+                </div>
+                
+                <div class="metrica">
+                    <div class="metrica-titulo">📦 Rotación Mensual</div>
+                    <div class="metrica-valor" id="rotacion">-</div>
+                    <div class="metrica-descripcion">Veces que se vende el inventario en el mes</div>
+                </div>
+                
+                <div class="metrica">
+                    <div class="metrica-titulo">💰 Margen CxC vs CxP</div>
+                    <div class="metrica-valor" id="margenCartera">-</div>
+                    <div class="metrica-descripcion">Lo que me deben vs lo que debo (sin inventario)</div>
+                </div>
+                
+                <div class="metrica">
+                    <div class="metrica-titulo">🛡️ Margen CON Respaldo</div>
+                    <div class="metrica-valor" id="margenConRespaldo">-</div>
+                    <div class="metrica-descripcion">Inventario + CxC - CxP (tu posición REAL)</div>
+                </div>
+                
+                <div class="metrica">
+                    <div class="metrica-titulo">⏱️ Cobertura Inventario</div>
+                    <div class="metrica-valor" id="cobertura">-</div>
+                    <div class="metrica-descripcion">¿Alcanza inventario para dias que faltan?</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PROYECCIONES -->
+        <div class="card resultado" id="proyecciones">
+            <h2>🔮 Proyecciones - Fin de Mes (31 julio 2026)</h2>
+            <table class="proyeccion-table">
+                <tr class="label-row">
+                    <td style="width: 40%;">Concepto</td>
+                    <td style="width: 30%; text-align: right;">Valor Actual</td>
+                    <td style="width: 30%; text-align: right;">Proyectado Fin Mes</td>
+                </tr>
+                <tr>
+                    <td>💵 Ventas Línea</td>
+                    <td class="numero" id="vta-actual">-</td>
+                    <td class="numero" id="vta-proy">-</td>
+                </tr>
+                <tr>
+                    <td>💳 CxC por Proveedor</td>
+                    <td class="numero" id="cxc-actual">-</td>
+                    <td class="numero" id="cxc-proy">-</td>
+                </tr>
+                <tr>
+                    <td>📦 Inventario</td>
+                    <td class="numero" id="inv-actual">-</td>
+                    <td class="numero" id="inv-proy">-</td>
+                </tr>
+                <tr>
+                    <td>🏦 CxP Proveedor</td>
+                    <td class="numero" id="cxp-actual">-</td>
+                    <td class="numero" id="cxp-proy">-</td>
+                </tr>
+                <tr class="label-row">
+                    <td>📊 Margen (CxC - CxP)</td>
+                    <td class="numero" id="margen-actual">-</td>
+                    <td class="numero" id="margen-proy">-</td>
+                </tr>
+                <tr>
+                    <td>🛡️ Margen CON Respaldo (Inv + CxC - CxP)</td>
+                    <td class="numero" id="margen-respaldo-actual">-</td>
+                    <td class="numero" id="margen-respaldo-proy">-</td>
+                </tr>
+            </table>
+        </div>
+        
+        <!-- ANÁLISIS PROFUNDO -->
+        <div class="card resultado" id="resultadoProfundo">
+            <h2>🔬 Análisis Profundo Operacional</h2>
+            <div id="analisisProfundo"></div>
+        </div>
+        
+        <div class="footer">
+            📊 Análisis Operacional Mensual | Julio 2026<br>
+            Desarrollada por <strong>Vibras Positivas HM</strong> — Derechos de Autor Reservados
+        </div>
+    </div>
+    
+    <script>
+        function formatCOP(valor) {
+            return new Intl.NumberFormat('es-CO', {
+                style: 'currency',
+                currency: 'COP',
+                maximumFractionDigits: 0
+            }).format(valor);
+        }
+        
+        function actualizarDiasFaltantes() {
+            const diasHabiles = parseFloat(document.getElementById('diasHabiles').value) || 0;
+            const diasTrabajados = parseFloat(document.getElementById('diasTrabajados').value) || 0;
+            const diasFaltan = diasHabiles - diasTrabajados;
+            document.getElementById('diasFaltanMostrado').textContent = Math.max(0, diasFaltan);
+        }
+        
+        // Eventos para calcular automáticamente
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('diasHabiles').addEventListener('change', actualizarDiasFaltantes);
+            document.getElementById('diasHabiles').addEventListener('input', actualizarDiasFaltantes);
+            document.getElementById('diasTrabajados').addEventListener('change', actualizarDiasFaltantes);
+            document.getElementById('diasTrabajados').addEventListener('input', actualizarDiasFaltantes);
+        });
+        
+        function analizarDatos() {
+            const nombreProveedor = document.getElementById('nombreProveedor').value || 'PROVEEDOR';
+            const diasHabiles = parseFloat(document.getElementById('diasHabiles').value) || 0;
+            const diasTrabajados = parseFloat(document.getElementById('diasTrabajados').value) || 0;
+            const diasFaltan = Math.max(0, diasHabiles - diasTrabajados);
+            const ventasMes = parseFloat(document.getElementById('ventasMes').value) || 0;
+            const inventario = parseFloat(document.getElementById('inventario').value) || 0;
+            const cxcProveedor = parseFloat(document.getElementById('cxcProveedor').value) || 0;
+            const cxpProveedor = parseFloat(document.getElementById('cxpProveedor').value) || 0;
+            
+            if (!diasHabiles || !diasTrabajados || !ventasMes || !inventario || !cxcProveedor || !cxpProveedor) {
+                alert('⚠️ Por favor llena todos los campos');
+                return;
+            }
+            
+            // Guardar en localStorage
+            const datos = {
+                nombreProveedor, diasHabiles, diasTrabajados, ventasMes, inventario,
+                cxcProveedor, cxpProveedor, fecha: new Date().toISOString()
+            };
+            localStorage.setItem('financialAnalyzer', JSON.stringify(datos));
+            
+            // ========== CÁLCULOS ==========
+            const ventaDiaria = ventasMes / diasTrabajados;
+            const ventasProyectadas = ventasMes + (ventaDiaria * diasFaltan);
+            
+            const rotacion = (ventasMes / inventario).toFixed(2);
+            const rotacionProyectada = (ventasProyectadas / inventario).toFixed(2);
+            
+            // CxC: asumimos que parte de las nuevas ventas quedan en cartera (70% típico mayorista)
+            const cxcNuevas = ventaDiaria * diasFaltan * 0.7; // 70% de ventas futuras en cartera
+            const cxcProyectada = cxcProveedor + cxcNuevas;
+            
+            // Inventario se consume según rotación
+            const consumoInventario = ventasProyectadas;
+            const inventarioProyectado = Math.max(0, inventario - consumoInventario);
+            
+            const margenActual = cxcProveedor - cxpProveedor;
+            const margenProyectado = cxcProyectada - cxpProveedor;
+            
+            const cobertura = (inventario / ventaDiaria).toFixed(1);
+            const inventarioDiasFaltan = inventario / (ventaDiaria);
+            
+            // ========== MARGEN CON RESPALDO ==========
+            const margenConRespaldo = inventario + cxcProveedor - cxpProveedor;
+            const margenConRespalsoProyectado = inventarioProyectado + cxcProyectada - cxpProveedor;
+            
+            // ========== MOSTRAR MÉTRICAS ==========
+            document.getElementById('nombreResultado').innerHTML = 
+                `<h3>📍 ${nombreProveedor}</h3>
+                <small style="color: #666;">Julio 2026 | Días hábiles: ${diasHabiles} | Trabajados: ${diasTrabajados} | Faltan: ${diasFaltan} días</small>`;
+            
+            document.getElementById('ventaDiaria').textContent = formatCOP(ventaDiaria);
+            document.getElementById('rotacion').textContent = rotacion + 'x';
+            document.getElementById('margenCartera').textContent = formatCOP(margenActual);
+            document.getElementById('margenConRespaldo').textContent = formatCOP(margenConRespaldo);
+            document.getElementById('cobertura').textContent = Math.round(inventarioDiasFaltan) + ' días';
+            
+            // ========== PROYECCIONES ==========
+            document.getElementById('vta-actual').textContent = formatCOP(ventasMes);
+            document.getElementById('vta-proy').textContent = formatCOP(ventasProyectadas);
+            
+            document.getElementById('cxc-actual').textContent = formatCOP(cxcProveedor);
+            document.getElementById('cxc-proy').textContent = formatCOP(cxcProyectada);
+            
+            document.getElementById('inv-actual').textContent = formatCOP(inventario);
+            document.getElementById('inv-proy').textContent = formatCOP(inventarioProyectado);
+            
+            document.getElementById('cxp-actual').textContent = formatCOP(cxpProveedor);
+            document.getElementById('cxp-proy').textContent = formatCOP(cxpProveedor);
+            
+            document.getElementById('margen-actual').textContent = formatCOP(margenActual);
+            document.getElementById('margen-proy').textContent = formatCOP(margenProyectado);
+            
+            document.getElementById('margen-respaldo-actual').textContent = formatCOP(margenConRespaldo);
+            document.getElementById('margen-respaldo-proy').textContent = formatCOP(margenConRespalsoProyectado);
+            
+            // ========== ANÁLISIS PROFUNDO ==========
+            let html = '';
+            
+            // 1. ANÁLISIS DE ROTACIÓN
+            html += `<div class="analisis-profundo">
+                <h3>📦 Análisis de Rotación & Inventario</h3>`;
+            
+            if (rotacion >= 0.5) {
+                html += `<div class="success-badge">✓ ROTACIÓN SALUDABLE</div>`;
+                html += `<div class="analisis-punto">Rotación de <strong>${rotacion}x</strong> en el mes. Para un mes de trabajo es BUENA, indica movimiento rápido.</div>`;
+            } else if (rotacion >= 0.2) {
+                html += `<div class="danger-badge">⚠ ROTACIÓN LENTA</div>`;
+                html += `<div class="analisis-punto">Rotación de solo <strong>${rotacion}x</strong> en el mes. Inventario está congelado.</div>`;
+            } else {
+                html += `<div class="danger-badge">🔴 INVENTARIO CRÍTICO</div>`;
+                html += `<div class="analisis-punto">Rotación <strong>${rotacion}x</strong>. Capital prácticamente inmovilizado en ${nombreProveedor}.</div>`;
+            }
+            
+            html += `<div class="analisis-punto"><strong>Venta diaria actual:</strong> ${formatCOP(ventaDiaria)}</div>`;
+            html += `<div class="analisis-punto"><strong>Inventario disponible para:</strong> ${Math.round(inventarioDiasFaltan)} días de ventas (hasta fin de mes holgado? ${inventarioDiasFaltan > diasFaltan ? '✓ SÍ' : '❌ NO'})</div>`;
+            
+            if (inventarioDiasFaltan < diasFaltan) {
+                html += `<div class="warning">⚠️ ALERTA: Inventario insuficiente para los ${diasFaltan} días que faltan. Necesitas hacer compra urgente a ${nombreProveedor} o caerá stock.</div>`;
+            }
+            
+            html += `<div class="analisis-punto"><strong>Proyección de inventario fin mes:</strong> ${formatCOP(inventarioProyectado)} (${inventarioProyectado === 0 ? 'se agota' : 'queda stock'})</div>`;
+            html += `</div>`;
+            
+            // 2. ANÁLISIS DE CARTERA
+            html += `<div class="analisis-profundo">
+                <h3>💳 Análisis de Cartera & Flujo de Caja</h3>`;
+            
+            // Margen SIMPLE (sin inventario)
+            if (margenActual > 0) {
+                html += `<div class="success-badge">✓ MARGEN SIMPLE POSITIVO</div>`;
+                html += `<div class="analisis-punto"><strong>Sin contar inventario:</strong> Me deben ${formatCOP(margenActual)} más de lo que debo.</div>`;
+            } else {
+                html += `<div class="danger-badge">⚠ MARGEN SIMPLE NEGATIVO</div>`;
+                html += `<div class="analisis-punto"><strong>Sin contar inventario:</strong> Debo ${formatCOP(Math.abs(margenActual))} más de lo que me deben (CxP > CxC).</div>`;
+            }
+            
+            // Margen CON RESPALDO (con inventario)
+            if (margenConRespaldo > 0) {
+                html += `<div class="success-badge">✓ MARGEN CON RESPALDO POSITIVO</div>`;
+                html += `<div class="analisis-punto"><strong>CON Inventario como respaldo:</strong> Tienes ${formatCOP(margenConRespaldo)} de SUPERÁVIT REAL. ✓ Posición sólida.</div>`;
+            } else {
+                html += `<div class="danger-badge">🔴 MARGEN CON RESPALDO NEGATIVO</div>`;
+                html += `<div class="analisis-punto"><strong>Incluso CON inventario:</strong> Posición crítica. Debes ${formatCOP(Math.abs(margenConRespaldo))} más incluso vendiendo todo.</div>`;
+            }
+            
+            html += `<div class="analisis-punto" style="background: #fef3c7; padding: 1rem; border-radius: 6px; margin-top: 1rem; margin-bottom: 1rem;">
+                <strong>📌 LA DIFERENCIA CLAVE:</strong><br>
+                Margen Simple (CxC - CxP): ${formatCOP(margenActual)}<br>
+                + Inventario en bodega: ${formatCOP(inventario)}<br>
+                = Margen CON Respaldo: <strong>${formatCOP(margenConRespaldo)}</strong><br><br>
+                <em>El inventario es tu respaldo más importante. Puedes venderlo hoy/mañana y convertirlo en efectivo.</em>
+            </div>`;
+            
+            if (margenProyectado > 0) {
+                const mejora = margenProyectado - margenActual;
+                html += `<div class="analisis-punto"><strong>Fin de mes (margen simple):</strong> ${formatCOP(margenProyectado)}</div>`;
+            }
+            
+            if (margenConRespalsoProyectado > 0) {
+                const mejoraRespaldo = margenConRespalsoProyectado - margenConRespaldo;
+                html += `<div class="analisis-punto"><strong>Fin de mes (CON respaldo):</strong> ${formatCOP(margenConRespalsoProyectado)}</div>`;
+            }
+            
+            const diasCobroEst = (cxcProveedor / ventaDiaria).toFixed(0);
+            html += `<div class="analisis-punto"><strong>Ciclo de cobro estimado:</strong> ${diasCobroEst} días (cuánto demora dinero de clientes)</div>`;
+            
+            html += `</div>`;
+            
+            // 3. RECOMENDACIONES
+            html += `<div class="recomendacion">
+                <h4>🎯 Recomendaciones para Fin de Mes</h4>`;
+            
+            if (inventarioDiasFaltan < diasFaltan) {
+                html += `<div class="analisis-punto"><strong>1. URGENTE:</strong> Pedir a ${nombreProveedor} - No alcanza inventario para los ${diasFaltan} días que faltan.</div>`;
+            } else if (inventarioDiasFaltan < diasFaltan * 1.5) {
+                html += `<div class="analisis-punto"><strong>1. IMPORTANTE:</strong> Considera reorder con ${nombreProveedor}. Margen de seguridad ajustado.</div>`;
+            } else {
+                html += `<div class="analisis-punto"><strong>1. INVENTARIO:</strong> Suficiente para ${Math.round(inventarioDiasFaltan)} días. No hay urgencia de reorder.</div>`;
+            }
+            
+            // Análisis basado en margen con respaldo
+            if (margenConRespaldo > 0) {
+                html += `<div class="analisis-punto"><strong>2. POSICIÓN SÓLIDA:</strong> CON tu inventario, tienes ${formatCOP(margenConRespaldo)} de respaldo. Posición operacional fuerte.</div>`;
+            } else if (margenActual > 0) {
+                html += `<div class="analisis-punto"><strong>2. ATENCIÓN:</strong> Sin inventario está negativo, pero CON el inventario estás mejor. Mantén vigilancia en cobro.</div>`;
+            } else {
+                html += `<div class="analisis-punto"><strong>2. CRÍTICO:</strong> Incluso CON inventario la posición es negativa. ACELERA COBRO INMEDIATAMENTE.</div>`;
+            }
+            
+            if (rotacion < 0.3) {
+                html += `<div class="analisis-punto"><strong>3. ESTRATEGIA:</strong> Rotación baja (${rotacion}x). Considera: descuentos, promociones, revisar precio o bajar cantidad de SKUs.</div>`;
+            } else if (rotacion > 0.5) {
+                html += `<div class="analisis-punto"><strong>3. POSITIVO:</strong> Buena rotación (${rotacion}x). Inventario se mueve bien, continúa así.</div>`;
+            }
+            
+            html += `</div>`;
+            
+            document.getElementById('analisisProfundo').innerHTML = html;
+            
+            // Mostrar resultados
+            document.getElementById('resultado').classList.add('activo');
+            document.getElementById('proyecciones').classList.add('activo');
+            document.getElementById('resultadoProfundo').classList.add('activo');
+            
+            setTimeout(() => {
+                document.getElementById('resultado').scrollIntoView({ behavior: 'smooth' });
+            }, 200);
+        }
+        
+        function limpiarDatos() {
+            document.getElementById('nombreProveedor').value = '';
+            document.getElementById('diasHabiles').value = '';
+            document.getElementById('diasTrabajados').value = '';
+            document.getElementById('ventasMes').value = '';
+            document.getElementById('inventario').value = '';
+            document.getElementById('cxcProveedor').value = '';
+            document.getElementById('cxpProveedor').value = '';
+            document.getElementById('diasFaltanMostrado').textContent = '0';
+            
+            document.getElementById('resultado').classList.remove('activo');
+            document.getElementById('proyecciones').classList.remove('activo');
+            document.getElementById('resultadoProfundo').classList.remove('activo');
+            
+            localStorage.removeItem('financialAnalyzer');
+        }
+        
+        // Cargar datos al abrir
+        window.addEventListener('load', () => {
+            const datos = localStorage.getItem('financialAnalyzer');
+            if (datos) {
+                const {
+                    nombreProveedor, diasHabiles, diasTrabajados, ventasMes,
+                    inventario, cxcProveedor, cxpProveedor
+                } = JSON.parse(datos);
+                document.getElementById('nombreProveedor').value = nombreProveedor;
+                document.getElementById('diasHabiles').value = diasHabiles || 22;
+                document.getElementById('diasTrabajados').value = diasTrabajados;
+                document.getElementById('ventasMes').value = ventasMes;
+                document.getElementById('inventario').value = inventario;
+                document.getElementById('cxcProveedor').value = cxcProveedor;
+                document.getElementById('cxpProveedor').value = cxpProveedor;
+                actualizarDiasFaltantes();
+            }
+        });
+    </script>
+</body>
+</html>
